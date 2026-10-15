@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="color-scheme" content="light dark" />
+  <link rel="icon" href="data:," />
+  <title>CSC Formation Atlas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&amp;family=Newsreader:opsz,wght@6..72,500;6..72,650&amp;display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: light dark;
+      --paper:#f2f0e9;
+      --paper-2:#e9e6dc;
+      --ink:#17201d;
+      --muted:#56615d;
+      --line:#c9c7bd;
+      --panel:#f8f7f2;
+      --accent:#bd4b2f;
+      --accent-soft:#ead1c8;
+      --green:#284f42;
+      --green-soft:#dce6df;
+      --shadow:0 18px 50px rgba(30,39,35,.09);
+    }
+    @media (prefers-color-scheme:dark){
+      :root{
+        --paper:#151a18;
+        --paper-2:#1b211e;
+        --ink:#eef0e9;
+        --muted:#abb4af;
+        --line:#3a423e;
+        --panel:#202724;
+        --accent:#ee896c;
+        --accent-soft:#4b2b23;
+        --green:#a5c9b6;
+        --green-soft:#263d33;
+        --shadow:0 18px 50px rgba(0,0,0,.22);
+      }
+    }
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+    body{margin:0;background:var(--paper);color:var(--ink);font-family:"IBM Plex Sans",sans-serif;line-height:1.5}
+    button,input{font:inherit}
+    a{color:inherit}
+    .shell{max-width:1440px;margin:auto;padding:26px 30px 72px}
+    .mast{display:grid;grid-template-columns:minmax(0,1.45fr) minmax(260px,.55fr);gap:44px;padding:34px 0 38px;border-bottom:1px solid var(--line)}
+    .kicker{display:flex;align-items:center;gap:10px;color:var(--accent);font-weight:600;font-size:.82rem;letter-spacing:.08em;text-transform:uppercase}
+    .kicker:before{content:"";width:26px;height:2px;background:currentColor}
+    h1{font-family:"Newsreader",serif;font-size:clamp(3.1rem,7vw,6.9rem);font-weight:500;line-height:.88;letter-spacing:-.052em;margin:24px 0 22px;max-width:950px}
+    .lead{font-family:"Newsreader",serif;font-size:clamp(1.25rem,2vw,1.7rem);line-height:1.35;max-width:750px;margin:0;color:var(--muted)}
+    .thesis{align-self:end;border-top:4px solid var(--accent);padding-top:18px}
+    .thesis strong{font-family:"Newsreader",serif;font-size:1.6rem;line-height:1.15;display:block;margin-bottom:9px}
+    .thesis p{margin:0;color:var(--muted)}
+    .metrics{display:flex;flex-wrap:wrap;gap:9px;margin-top:26px}
+    .metric{padding:8px 12px;border:1px solid var(--line);background:var(--panel);font-size:.82rem}
+    .nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--paper) 90%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);display:flex;gap:6px;align-items:center;padding:12px 0;margin-bottom:32px}
+    .tab{border:0;background:transparent;color:var(--muted);padding:9px 12px;cursor:pointer;font-weight:600;border-radius:4px}
+    .tab[aria-selected="true"]{background:var(--ink);color:var(--paper)}
+    .nav-note{margin-left:auto;color:var(--muted);font-size:.8rem}
+    .view{display:none}.view.active{display:block}
+    .atlas-layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:42px;align-items:start}
+    .controls{position:sticky;top:74px}
+    .controls h2,.section-head h2{font-family:"Newsreader",serif;font-weight:600;letter-spacing:-.025em}
+    .controls h2{font-size:1.45rem;margin:0 0 14px}
+    .search{width:100%;background:var(--panel);color:var(--ink);border:1px solid var(--line);padding:12px 13px;border-radius:4px;outline:none}
+    .search:focus{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+    .filter-list{display:grid;gap:4px;margin-top:12px}
+    .filter{width:100%;text-align:left;border:0;background:transparent;color:var(--muted);padding:9px 10px;cursor:pointer;border-left:2px solid transparent}
+    .filter.active{color:var(--ink);border-left-color:var(--accent);background:var(--paper-2);font-weight:600}
+    .reading-note{margin-top:24px;padding-top:18px;border-top:1px solid var(--line);color:var(--muted);font-size:.86rem}
+    .reading-note strong{color:var(--ink)}
+    .phases{position:relative;display:grid;gap:18px}
+    .phases:before{content:"";position:absolute;left:31px;top:18px;bottom:18px;width:1px;background:var(--line)}
+    .phase{position:relative;display:grid;grid-template-columns:64px minmax(0,1fr);gap:18px}
+    .phase-index{width:64px;height:64px;background:var(--paper);border:1px solid var(--line);display:grid;place-items:center;font-family:"Newsreader",serif;font-size:1.65rem;z-index:1}
+    .phase-card{background:var(--panel);box-shadow:var(--shadow);border-top:3px solid var(--phase-color,var(--accent))}
+    .phase-head{display:grid;grid-template-columns:1fr auto;gap:16px;padding:20px 22px 16px;border-bottom:1px solid var(--line)}
+    .phase-title{margin:0;font-family:"Newsreader",serif;font-size:1.7rem;letter-spacing:-.025em}
+    .phase-focus{margin:4px 0 0;color:var(--muted);font-size:.9rem}
+    .age{font-weight:600;font-size:.84rem;color:var(--phase-color,var(--accent));white-space:nowrap}
+    .subject-list{display:grid}
+    .subject{display:grid;grid-template-columns:36px minmax(170px,.7fr) minmax(260px,1.4fr) auto;gap:12px;align-items:center;padding:13px 22px;border-bottom:1px solid var(--line)}
+    .subject:last-child{border-bottom:0}
+    .subject-no{font-family:"Newsreader",serif;color:var(--muted);font-size:1.05rem}
+    .subject h3{margin:0;font-size:.98rem}
+    .subject p{margin:0;color:var(--muted);font-size:.86rem}
+    .wiki-links{display:flex;flex-wrap:wrap;gap:4px 12px;justify-content:flex-end}
+    .wiki{display:inline-flex;align-items:center;gap:6px;text-decoration:none;color:var(--phase-color,var(--green));font-size:.82rem;font-weight:600;padding:6px 0;white-space:nowrap}
+    .wiki:hover{text-decoration:underline;text-underline-offset:3px}
+    .wiki svg{width:14px;height:14px}
+    .empty{display:none;padding:36px;border:1px dashed var(--line);text-align:center;color:var(--muted)}
+    .section-head{display:grid;grid-template-columns:1fr minmax(260px,.58fr);gap:30px;align-items:end;margin:24px 0 28px}
+    .section-head h2{font-size:clamp(2.4rem,5vw,5rem);line-height:.95;margin:0;letter-spacing:-.045em}
+    .section-head p{margin:0;color:var(--muted)}
+    .path{display:grid;grid-template-columns:repeat(5,1fr);gap:1px;background:var(--line);border:1px solid var(--line);margin:30px 0}
+    .node{background:var(--panel);padding:22px 20px;min-height:245px;position:relative}
+    .node:after{content:"→";position:absolute;right:-13px;top:32px;z-index:2;color:var(--accent);background:var(--paper);width:25px;height:25px;display:grid;place-items:center;border-radius:50%;font-weight:600}
+    .node:last-child:after{display:none}
+    .node small{color:var(--accent);font-weight:600}
+    .node h3{font-family:"Newsreader",serif;font-size:1.45rem;margin:9px 0 10px}
+    .node p{font-size:.87rem;color:var(--muted);margin:0 0 14px}
+    .node a{font-size:.82rem;font-weight:600;color:var(--green)}
+    .path-closing{font-family:"Newsreader",serif;font-size:1.28rem;line-height:1.35;margin:26px 0 0;padding:22px 0;border-top:1px solid var(--line)}
+    .test-grid{display:grid;grid-template-columns:1fr 1fr;gap:22px;margin-top:26px}
+    .exercise{background:var(--green-soft);padding:26px}
+    .exercise h3{font-family:"Newsreader",serif;font-size:1.5rem;margin:0 0 12px}
+    .exercise ol{margin:0;padding-left:20px}.exercise li{margin:9px 0}
+    .check{background:var(--accent-soft);padding:26px}
+    .check h3{font-family:"Newsreader",serif;font-size:1.5rem;margin:0 0 12px}
+    .check blockquote{font-family:"Newsreader",serif;font-size:1.28rem;line-height:1.35;margin:0}
+    .prompt-wrap{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(270px,.65fr);gap:30px}
+    .prompt-card{background:var(--ink);color:var(--paper);padding:clamp(24px,4vw,46px);box-shadow:var(--shadow)}
+    .prompt-card h2{font-family:"Newsreader",serif;font-size:clamp(2.4rem,4.5vw,4.8rem);line-height:.95;margin:0 0 18px;letter-spacing:-.04em}
+    .prompt-card p{color:color-mix(in srgb,var(--paper) 72%,transparent);max-width:660px}
+    .prompt-text{white-space:pre-wrap;background:color-mix(in srgb,var(--paper) 7%,transparent);border:1px solid color-mix(in srgb,var(--paper) 18%,transparent);padding:20px;margin:26px 0 18px;font-family:"IBM Plex Sans",sans-serif;font-size:.9rem;line-height:1.58;max-height:410px;overflow:auto}
+    .copy{border:0;background:var(--accent);color:#fff;padding:12px 16px;font-weight:600;cursor:pointer;border-radius:3px}
+    .copy:focus-visible,.tab:focus-visible,.filter:focus-visible{outline:3px solid var(--accent-soft);outline-offset:2px}
+    .principles{display:grid;gap:12px;align-content:start}
+    .principle{border-top:1px solid var(--line);padding:16px 0}
+    .principle b{display:block;margin-bottom:4px}.principle span{color:var(--muted);font-size:.88rem}
+    .status{min-height:1.5em;margin-top:8px;color:var(--green);font-size:.84rem}
+    .source-footer{margin-top:56px;border-top:1px solid var(--line);padding-top:18px;display:flex;justify-content:space-between;gap:24px;color:var(--muted);font-size:.78rem}
+    .source-footer strong{color:var(--ink)}
+    mark{background:var(--accent-soft);color:var(--ink);padding:0 1px}
+    @media(max-width:950px){
+      .mast{grid-template-columns:1fr}.thesis{max-width:620px}
+      .atlas-layout{grid-template-columns:1fr}.controls{position:static;display:grid;grid-template-columns:1fr 1fr;gap:16px}.controls h2,.reading-note{grid-column:1/-1}.filter-list{grid-template-columns:repeat(4,1fr);margin:0}.filter{text-align:center;border-left:0;border-bottom:2px solid transparent}.filter.active{border-left:0;border-bottom-color:var(--accent)}
+      .path{grid-template-columns:1fr}.node{min-height:auto}.node:after{content:"↓";right:auto;left:24px;top:auto;bottom:-13px}.test-grid,.prompt-wrap{grid-template-columns:1fr}
+    }
+    @media(max-width:660px){
+      .shell{padding:16px 16px 50px}.mast{padding-top:18px;gap:26px}h1{font-size:3.55rem}
+      .nav{margin-left:-16px;margin-right:-16px;padding-left:16px;padding-right:16px;overflow:visible}.nav-note{display:none}.tab{padding:9px 8px;font-size:.86rem}
+      .controls{grid-template-columns:1fr}.controls h2,.reading-note{grid-column:auto}.filter-list{grid-template-columns:1fr 1fr}
+      .phase{grid-template-columns:38px minmax(0,1fr);gap:10px}.phases:before{left:18px}.phase-index{width:38px;height:38px;font-size:1.1rem}.phase-head{grid-template-columns:1fr;padding:16px}.age{white-space:normal}.subject{grid-template-columns:26px minmax(0,1fr);padding:14px 16px}.subject h3,.subject p,.subject .wiki-links{grid-column:2}.subject p{margin-top:-6px}.subject .wiki-links{justify-self:start;justify-content:flex-start}.phase-title{font-size:1.45rem}
+      .section-head{grid-template-columns:1fr}.source-footer{flex-direction:column}
+    }
+    @media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+  </style>
+</head>
+<body>
+  <main class="shell">
+    <section class="mast" aria-labelledby="page-title">
+      <div>
+        <div class="kicker">The curriculum is the order</div>
+        <h1 id="page-title">From sensing life to designing systems.</h1>
+        <p class="lead">An eight-phase map of 40 subjects. Each subject begins with a Wikipedia doorway; the Formation supplies the sequence, the learner supplies questions, and an AI tutor supplies the live bridge.</p>
+        <div class="metrics" aria-label="Curriculum summary">
+          <span class="metric">8 phases</span><span class="metric">40 subjects</span><span class="metric">Ages 7–27</span><span class="metric">1 test path ready</span>
+        </div>
+      </div>
+      <aside class="thesis">
+        <strong>Knowledge exists. Order is the curriculum.</strong>
+        <p>The work here is not to rewrite the library. It is to connect it in a deliberate order: body → hand → systems → care → stewardship → citizenship → transmission → architecture.</p>
+      </aside>
+    </section>
+
+    <nav class="nav" aria-label="Page views">
+      <button class="tab" data-view="atlas" aria-selected="true">Formation atlas</button>
+      <button class="tab" data-view="path" aria-selected="false">Test path</button>
+      <button class="tab" data-view="tutor" aria-selected="false">AI tutor blueprint</button>
+      <span class="nav-note">Wikipedia is the library · CSC is the route</span>
+    </nav>
+
+    <section class="view active" id="atlas-view">
+      <div class="atlas-layout">
+        <aside class="controls">
+          <h2>Navigate the formation</h2>
+          <input id="search" class="search" type="search" placeholder="Find a subject or idea" aria-label="Search subjects">
+          <div class="filter-list" aria-label="Filter by phase">
+            <button class="filter active" data-phase="all">All phases</button>
+            <button class="filter" data-phase="1">01 Sensing</button><button class="filter" data-phase="2">02 Building</button>
+            <button class="filter" data-phase="3">03 Systems</button><button class="filter" data-phase="4">04 Healer</button>
+            <button class="filter" data-phase="5">05 Steward</button><button class="filter" data-phase="6">06 Citizen</button>
+            <button class="filter" data-phase="7">07 Transmitter</button><button class="filter" data-phase="8">08 Architect</button>
+          </div>
+          <p class="reading-note"><strong>How to use the links</strong><br>Each opens an English Wikipedia starting point. Treat the article as a map: follow its internal links, references and related topics. Wikipedia is living material, not a frozen lesson.</p>
+        </aside>
+
+        <div>
+          <div class="phases" id="phases">
+            <article class="phase" data-phase="1" style="--phase-color:#9a5d28"><div class="phase-index">01</div><div class="phase-card">
+              <header class="phase-head"><div><h2 class="phase-title">The Sensing Body</h2><p class="phase-focus">Observe natural systems before abstracting them.</p></div><div class="age">Ages 7–10</div></header>
+              <div class="subject-list">
+                <div class="subject" data-search="botany plant cycles, photosynthesis, roots and visible growth. botany plant photosynthesis"><span class="subject-no">01</span><h3>Botany</h3><p>Plant cycles, photosynthesis, roots and visible growth.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Botany" target="_blank" rel="noopener">Botany ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Plant" target="_blank" rel="noopener">Plant ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Photosynthesis" target="_blank" rel="noopener">Photosynthesis ↗</a></div></div>
+                <div class="subject" data-search="soil soil as a living system of minerals, organisms and nutrients. soil compost soil biology"><span class="subject-no">02</span><h3>Soil</h3><p>Soil as a living system of minerals, organisms and nutrients.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Soil" target="_blank" rel="noopener">Soil ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Compost" target="_blank" rel="noopener">Compost ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Soil_biology" target="_blank" rel="noopener">Soil biology ↗</a></div></div>
+                <div class="subject" data-search="weather clouds, pressure, wind and short-term atmospheric change. weather water cycle atmosphere of earth"><span class="subject-no">03</span><h3>Weather</h3><p>Clouds, pressure, wind and short-term atmospheric change.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Weather" target="_blank" rel="noopener">Weather ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Water_cycle" target="_blank" rel="noopener">Water cycle ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Atmosphere_of_Earth" target="_blank" rel="noopener">Atmosphere of Earth ↗</a></div></div>
+                <div class="subject" data-search="animal behavior observe patterns, tracks, signals and adaptive action. ethology animal migration hibernation"><span class="subject-no">04</span><h3>Animal behavior</h3><p>Observe patterns, tracks, signals and adaptive action.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Ethology" target="_blank" rel="noopener">Ethology ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Animal_migration" target="_blank" rel="noopener">Animal migration ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Hibernation" target="_blank" rel="noopener">Hibernation ↗</a></div></div>
+                <div class="subject" data-search="ecology food webs, biodiversity, niches and carrying capacity. ecology ecosystem food web"><span class="subject-no">05</span><h3>Ecology</h3><p>Food webs, biodiversity, niches and carrying capacity.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Ecology" target="_blank" rel="noopener">Ecology ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Ecosystem" target="_blank" rel="noopener">Ecosystem ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Food_web" target="_blank" rel="noopener">Food web ↗</a></div></div>
+              </div>
+            </div></article>
+
+            <article class="phase" data-phase="2" style="--phase-color:#a1751f"><div class="phase-index">02</div><div class="phase-card">
+              <header class="phase-head"><div><h2 class="phase-title">The Building Hand</h2><p class="phase-focus">Transform matter; learn physical principles through tools.</p></div><div class="age">Ages 10–13</div></header>
+              <div class="subject-list">
+                <div class="subject" data-search="carpentry wood, joints, tools, loads and craft discipline. carpentry woodworking joinery"><span class="subject-no">06</span><h3>Carpentry</h3><p>Wood, joints, tools, loads and craft discipline.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Carpentry" target="_blank" rel="noopener">Carpentry ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Woodworking" target="_blank" rel="noopener">Woodworking ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Joinery" target="_blank" rel="noopener">Joinery ↗</a></div></div>
+                <div class="subject" data-search="mechanical physics force, mass, leverage, torque, friction and motion. classical mechanics simple machine force"><span class="subject-no">07</span><h3>Mechanical physics</h3><p>Force, mass, leverage, torque, friction and motion.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Classical_mechanics" target="_blank" rel="noopener">Classical mechanics ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Simple_machine" target="_blank" rel="noopener">Simple machine ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Force" target="_blank" rel="noopener">Force ↗</a></div></div>
+                <div class="subject" data-search="electronics voltage, current, resistance and readable circuits. electronics electric circuit ohm's law"><span class="subject-no">08</span><h3>Electronics</h3><p>Voltage, current, resistance and readable circuits.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Electronics" target="_blank" rel="noopener">Electronics ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Electric_circuit" target="_blank" rel="noopener">Electric circuit ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Ohm's_law" target="_blank" rel="noopener">Ohm's law ↗</a></div></div>
+                <div class="subject" data-search="building geometry area, volume, structural triangles and precise measurement. geometry pythagorean theorem triangle"><span class="subject-no">09</span><h3>Building geometry</h3><p>Area, volume, structural triangles and precise measurement.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Geometry" target="_blank" rel="noopener">Geometry ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Pythagorean_theorem" target="_blank" rel="noopener">Pythagorean theorem ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Triangle" target="_blank" rel="noopener">Triangle ↗</a></div></div>
+                <div class="subject" data-search="materials properties of wood, metal, concrete and polymers under stress. materials science wood metal"><span class="subject-no">10</span><h3>Materials</h3><p>Properties of wood, metal, concrete and polymers under stress.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Materials_science" target="_blank" rel="noopener">Materials science ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Wood" target="_blank" rel="noopener">Wood ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Metal" target="_blank" rel="noopener">Metal ↗</a></div></div>
+              </div>
+            </div></article>
+
+            <article class="phase" data-phase="3" style="--phase-color:#53733a"><div class="phase-index">03</div><div class="phase-card">
+              <header class="phase-head"><div><h2 class="phase-title">The Systems Mind</h2><p class="phase-focus">Read inputs, outputs, flows and gradients.</p></div><div class="age">Ages 13–15</div></header>
+              <div class="subject-list">
+                <div class="subject" data-search="thermodynamics heat, work, energy, conservation and efficiency. thermodynamics laws of thermodynamics heat engine"><span class="subject-no">11</span><h3>Thermodynamics</h3><p>Heat, work, energy, conservation and efficiency.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Thermodynamics" target="_blank" rel="noopener">Thermodynamics ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Laws_of_thermodynamics" target="_blank" rel="noopener">Laws of thermodynamics ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Heat_engine" target="_blank" rel="noopener">Heat engine ↗</a></div></div>
+                <div class="subject" data-search="fluids pressure, velocity and the behavior of moving fluids. fluid mechanics buoyancy hydraulics"><span class="subject-no">12</span><h3>Fluids</h3><p>Pressure, velocity and the behavior of moving fluids.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Fluid_mechanics" target="_blank" rel="noopener">Fluid mechanics ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Buoyancy" target="_blank" rel="noopener">Buoyancy ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Hydraulics" target="_blank" rel="noopener">Hydraulics ↗</a></div></div>
+                <div class="subject" data-search="electrical systems generation, ac/dc current, transformers and safe distribution. electric power system electrical grid circuit breaker"><span class="subject-no">13</span><h3>Electrical systems</h3><p>Generation, AC/DC current, transformers and safe distribution.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Electric_power_system" target="_blank" rel="noopener">Electric power system ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Electrical_grid" target="_blank" rel="noopener">Electrical grid ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Circuit_breaker" target="_blank" rel="noopener">Circuit breaker ↗</a></div></div>
+                <div class="subject" data-search="structures trusses, arches, shear, torsion and structural failure. structural engineering bridge load-bearing wall"><span class="subject-no">14</span><h3>Structures</h3><p>Trusses, arches, shear, torsion and structural failure.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Structural_engineering" target="_blank" rel="noopener">Structural engineering ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Bridge" target="_blank" rel="noopener">Bridge ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Load-bearing_wall" target="_blank" rel="noopener">Load-bearing wall ↗</a></div></div>
+                <div class="subject" data-search="environmental science biogeochemical cycles and the services ecosystems provide. environmental science pollution sustainability"><span class="subject-no">15</span><h3>Environmental science</h3><p>Biogeochemical cycles and the services ecosystems provide.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Environmental_science" target="_blank" rel="noopener">Environmental science ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Pollution" target="_blank" rel="noopener">Pollution ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Sustainability" target="_blank" rel="noopener">Sustainability ↗</a></div></div>
+              </div>
+            </div></article>
+
+            <article class="phase" data-phase="4" style="--phase-color:#2f7a72"><div class="phase-index">04</div><div class="phase-card">
+              <header class="phase-head"><div><h2 class="phase-title">The Healer</h2><p class="phase-focus">Health literacy as baseline civilian capability.</p></div><div class="age">Ages 15–17</div></header>
+              <div class="subject-list">
+                <div class="subject" data-search="anatomy architecture of the skeletal, organ, circulatory and nervous systems. human anatomy human body organ (anatomy)"><span class="subject-no">16</span><h3>Anatomy</h3><p>Architecture of the skeletal, organ, circulatory and nervous systems.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Human_anatomy" target="_blank" rel="noopener">Human anatomy ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Human_body" target="_blank" rel="noopener">Human body ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Organ_(anatomy)" target="_blank" rel="noopener">Organ (anatomy) ↗</a></div></div>
+                <div class="subject" data-search="nutrition nutrients, digestion and cellular metabolism. nutrition macronutrient vitamin"><span class="subject-no">17</span><h3>Nutrition</h3><p>Nutrients, digestion and cellular metabolism.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Nutrition" target="_blank" rel="noopener">Nutrition ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Macronutrient" target="_blank" rel="noopener">Macronutrient ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Vitamin" target="_blank" rel="noopener">Vitamin ↗</a></div></div>
+                <div class="subject" data-search="emergency medicine first response concepts: cpr, airway, wounds, fractures and triage. emergency medicine first aid cardiopulmonary resuscitation"><span class="subject-no">18</span><h3>Emergency medicine</h3><p>First response concepts: CPR, airway, wounds, fractures and triage.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Emergency_medicine" target="_blank" rel="noopener">Emergency medicine ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/First_aid" target="_blank" rel="noopener">First aid ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Cardiopulmonary_resuscitation" target="_blank" rel="noopener">Cardiopulmonary resuscitation ↗</a></div></div>
+                <div class="subject" data-search="kinesiology human movement, force generation, joint load and safety. kinesiology exercise human musculoskeletal system"><span class="subject-no">19</span><h3>Kinesiology</h3><p>Human movement, force generation, joint load and safety.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Kinesiology" target="_blank" rel="noopener">Kinesiology ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Exercise" target="_blank" rel="noopener">Exercise ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Human_musculoskeletal_system" target="_blank" rel="noopener">Human musculoskeletal system ↗</a></div></div>
+                <div class="subject" data-search="microbiology microbes, immunity, sanitation and responsible antibiotic use. microbiology bacteria virus"><span class="subject-no">20</span><h3>Microbiology</h3><p>Microbes, immunity, sanitation and responsible antibiotic use.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Microbiology" target="_blank" rel="noopener">Microbiology ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Bacteria" target="_blank" rel="noopener">Bacteria ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Virus" target="_blank" rel="noopener">Virus ↗</a></div></div>
+              </div>
+            </div></article>
+
+            <article class="phase" data-phase="5" style="--phase-color:#32698a"><div class="phase-index">05</div><div class="phase-card">
+              <header class="phase-head"><div><h2 class="phase-title">The Steward</h2><p class="phase-focus">Manage resource flows without degrading the system.</p></div><div class="age">Ages 17–19</div></header>
+              <div class="subject-list">
+                <div class="subject" data-search="accounting bookkeeping, balance sheets, cash flow and financial health. accounting bookkeeping balance sheet"><span class="subject-no">21</span><h3>Accounting</h3><p>Bookkeeping, balance sheets, cash flow and financial health.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Accounting" target="_blank" rel="noopener">Accounting ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Bookkeeping" target="_blank" rel="noopener">Bookkeeping ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Balance_sheet" target="_blank" rel="noopener">Balance sheet ↗</a></div></div>
+                <div class="subject" data-search="contract law valid agreements, obligations, risk clauses and negotiation. contract contract law breach of contract"><span class="subject-no">22</span><h3>Contract law</h3><p>Valid agreements, obligations, risk clauses and negotiation.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Contract" target="_blank" rel="noopener">Contract ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Contract_law" target="_blank" rel="noopener">Contract law ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Breach_of_contract" target="_blank" rel="noopener">Breach of contract ↗</a></div></div>
+                <div class="subject" data-search="behavioral economics how biases alter choices, incentives and resource decisions. behavioral economics cognitive bias nudge theory"><span class="subject-no">23</span><h3>Behavioral economics</h3><p>How biases alter choices, incentives and resource decisions.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Behavioral_economics" target="_blank" rel="noopener">Behavioral economics ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Cognitive_bias" target="_blank" rel="noopener">Cognitive bias ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Nudge_theory" target="_blank" rel="noopener">Nudge theory ↗</a></div></div>
+                <div class="subject" data-search="agricultural economics input costs, yield, food systems and soil preservation. agricultural economics food security subsistence agriculture"><span class="subject-no">24</span><h3>Agricultural economics</h3><p>Input costs, yield, food systems and soil preservation.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Agricultural_economics" target="_blank" rel="noopener">Agricultural economics ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Food_security" target="_blank" rel="noopener">Food security ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Subsistence_agriculture" target="_blank" rel="noopener">Subsistence agriculture ↗</a></div></div>
+                <div class="subject" data-search="statistics describe data, sample responsibly and test inference. statistics probability sampling (statistics)"><span class="subject-no">25</span><h3>Statistics</h3><p>Describe data, sample responsibly and test inference.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Statistics" target="_blank" rel="noopener">Statistics ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Probability" target="_blank" rel="noopener">Probability ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Sampling_(statistics)" target="_blank" rel="noopener">Sampling (statistics) ↗</a></div></div>
+              </div>
+            </div></article>
+
+            <article class="phase" data-phase="6" style="--phase-color:#4f5f9b"><div class="phase-index">06</div><div class="phase-card">
+              <header class="phase-head"><div><h2 class="phase-title">The Citizen</h2><p class="phase-focus">Understand civic decisions and shared infrastructure.</p></div><div class="age">Ages 19–21</div></header>
+              <div class="subject-list">
+                <div class="subject" data-search="civics rights, obligations, public institutions and accountability. civics democracy constitution"><span class="subject-no">26</span><h3>Civics</h3><p>Rights, obligations, public institutions and accountability.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Civics" target="_blank" rel="noopener">Civics ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Democracy" target="_blank" rel="noopener">Democracy ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Constitution" target="_blank" rel="noopener">Constitution ↗</a></div></div>
+                <div class="subject" data-search="urban planning land use, zoning, density, mobility and infrastructure tradeoffs. urban planning city infrastructure"><span class="subject-no">27</span><h3>Urban planning</h3><p>Land use, zoning, density, mobility and infrastructure tradeoffs.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Urban_planning" target="_blank" rel="noopener">Urban planning ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/City" target="_blank" rel="noopener">City ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Infrastructure" target="_blank" rel="noopener">Infrastructure ↗</a></div></div>
+                <div class="subject" data-search="sociology institutions, trust, collective action and group dynamics. sociology social norm institution"><span class="subject-no">28</span><h3>Sociology</h3><p>Institutions, trust, collective action and group dynamics.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Sociology" target="_blank" rel="noopener">Sociology ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Social_norm" target="_blank" rel="noopener">Social norm ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Institution" target="_blank" rel="noopener">Institution ↗</a></div></div>
+                <div class="subject" data-search="political philosophy competing frameworks for authority, liberty and deliberation. political philosophy social contract justice"><span class="subject-no">29</span><h3>Political philosophy</h3><p>Competing frameworks for authority, liberty and deliberation.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Political_philosophy" target="_blank" rel="noopener">Political philosophy ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Social_contract" target="_blank" rel="noopener">Social contract ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Justice" target="_blank" rel="noopener">Justice ↗</a></div></div>
+                <div class="subject" data-search="logistics how goods move, where networks break and how slack matters. logistics supply chain inventory"><span class="subject-no">30</span><h3>Logistics</h3><p>How goods move, where networks break and how slack matters.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Logistics" target="_blank" rel="noopener">Logistics ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Supply_chain" target="_blank" rel="noopener">Supply chain ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Inventory" target="_blank" rel="noopener">Inventory ↗</a></div></div>
+              </div>
+            </div></article>
+
+            <article class="phase" data-phase="7" style="--phase-color:#75538b"><div class="phase-index">07</div><div class="phase-card">
+              <header class="phase-head"><div><h2 class="phase-title">The Transmitter</h2><p class="phase-focus">Reverse the flow: from receiving to teaching capability.</p></div><div class="age">Ages 21–24</div></header>
+              <div class="subject-list">
+                <div class="subject" data-search="pedagogy design learning, facilitate practice and test retention. pedagogy learning critical thinking"><span class="subject-no">31</span><h3>Pedagogy</h3><p>Design learning, facilitate practice and test retention.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Pedagogy" target="_blank" rel="noopener">Pedagogy ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Learning" target="_blank" rel="noopener">Learning ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Critical_thinking" target="_blank" rel="noopener">Critical thinking ↗</a></div></div>
+                <div class="subject" data-search="linguistics language structure, register and ambiguity reduction. linguistics language grammar"><span class="subject-no">32</span><h3>Linguistics</h3><p>Language structure, register and ambiguity reduction.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Linguistics" target="_blank" rel="noopener">Linguistics ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Language" target="_blank" rel="noopener">Language ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Grammar" target="_blank" rel="noopener">Grammar ↗</a></div></div>
+                <div class="subject" data-search="psychology memory, attention, emotional states and social influence. psychology cognitive psychology developmental psychology"><span class="subject-no">33</span><h3>Psychology</h3><p>Memory, attention, emotional states and social influence.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Psychology" target="_blank" rel="noopener">Psychology ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Cognitive_psychology" target="_blank" rel="noopener">Cognitive psychology ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Developmental_psychology" target="_blank" rel="noopener">Developmental psychology ↗</a></div></div>
+                <div class="subject" data-search="communication encoding, decoding, noise and feedback loops. communication rhetoric nonviolent communication"><span class="subject-no">34</span><h3>Communication</h3><p>Encoding, decoding, noise and feedback loops.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Communication" target="_blank" rel="noopener">Communication ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Rhetoric" target="_blank" rel="noopener">Rhetoric ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Nonviolent_Communication" target="_blank" rel="noopener">Nonviolent Communication ↗</a></div></div>
+                <div class="subject" data-search="conflict resolution de-escalate, negotiate and separate positions from interests. conflict resolution negotiation mediation"><span class="subject-no">35</span><h3>Conflict resolution</h3><p>De-escalate, negotiate and separate positions from interests.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Conflict_resolution" target="_blank" rel="noopener">Conflict resolution ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Negotiation" target="_blank" rel="noopener">Negotiation ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Mediation" target="_blank" rel="noopener">Mediation ↗</a></div></div>
+              </div>
+            </div></article>
+
+            <article class="phase" data-phase="8" style="--phase-color:#984a54"><div class="phase-index">08</div><div class="phase-card">
+              <header class="phase-head"><div><h2 class="phase-title">The Architect</h2><p class="phase-focus">Design systems able to correct themselves and outlive founders.</p></div><div class="age">Ages 24–27</div></header>
+              <div class="subject-list">
+                <div class="subject" data-search="systems thinking feedback, emergence, leverage points and adaptation. systems thinking systems theory feedback"><span class="subject-no">36</span><h3>Systems thinking</h3><p>Feedback, emergence, leverage points and adaptation.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Systems_thinking" target="_blank" rel="noopener">Systems thinking ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Systems_theory" target="_blank" rel="noopener">Systems theory ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Feedback" target="_blank" rel="noopener">Feedback ↗</a></div></div>
+                <div class="subject" data-search="organizational design structure groups, distribute authority and preserve learning. organizational structure organization decentralization"><span class="subject-no">37</span><h3>Organizational design</h3><p>Structure groups, distribute authority and preserve learning.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Organizational_structure" target="_blank" rel="noopener">Organizational structure ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Organization" target="_blank" rel="noopener">Organization ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Decentralization" target="_blank" rel="noopener">Decentralization ↗</a></div></div>
+                <div class="subject" data-search="ethics compare duties, consequences, virtues and moral complexity. ethics moral philosophy utilitarianism"><span class="subject-no">38</span><h3>Ethics</h3><p>Compare duties, consequences, virtues and moral complexity.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Ethics" target="_blank" rel="noopener">Ethics ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Moral_philosophy" target="_blank" rel="noopener">Moral philosophy ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Utilitarianism" target="_blank" rel="noopener">Utilitarianism ↗</a></div></div>
+                <div class="subject" data-search="civilizational history patterns of collapse, durability and institutional resilience. human history civilization societal collapse"><span class="subject-no">39</span><h3>Civilizational history</h3><p>Patterns of collapse, durability and institutional resilience.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Human_history" target="_blank" rel="noopener">Human history ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Civilization" target="_blank" rel="noopener">Civilization ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Societal_collapse" target="_blank" rel="noopener">Societal collapse ↗</a></div></div>
+                <div class="subject" data-search="applied philosophy audit concepts, arguments and hidden system assumptions. philosophy pragmatism epistemology"><span class="subject-no">40</span><h3>Applied philosophy</h3><p>Audit concepts, arguments and hidden system assumptions.</p><div class="wiki-links"><a class="wiki" href="https://en.wikipedia.org/wiki/Philosophy" target="_blank" rel="noopener">Philosophy ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Pragmatism" target="_blank" rel="noopener">Pragmatism ↗</a><a class="wiki" href="https://en.wikipedia.org/wiki/Epistemology" target="_blank" rel="noopener">Epistemology ↗</a></div></div>
+              </div>
+            </div></article>
+          </div>
+          <div class="empty" id="empty">No subject matches that search. Try a broader word such as “energy,” “health,” or “systems.”</div>
+        </div>
+      </div>
+    </section>
+
+    <section class="view" id="path-view">
+      <header class="section-head"><h2>Test path:<br>What grows?</h2><p>A five-node prototype for the first phase. The learner moves from direct observation to a connected ecological system—predicting before reading and checking against reality.</p></header>
+      <div class="path">
+        <article class="node"><h3>Node 1 — Soil: the living ground.</h3><p><strong>Read:</strong> <a href="https://en.wikipedia.org/wiki/Soil" target="_blank" rel="noopener">Soil</a>.</p><p><strong>Bridge — why here, what to notice:</strong> Before plants, before food, before everything: soil. And soil is not dirt — it's alive. It has structure, creatures, cycles. Notice that the ground under your feet is a system, not a surface. Everything in this path comes back to this node.</p><p><strong>Hands-on:</strong> Go outside. Pick up a handful of soil. Smell it. Look at it with a magnifier if you have one. Find three things in it that are alive or were alive.</p><p><strong>Tutor check:</strong> "Is soil alive? Defend your answer."</p></article>
+        <article class="node"><h3>Node 2 — Seed: the packed lunch.</h3><p><strong>Read:</strong> <a href="https://en.wikipedia.org/wiki/Seed" target="_blank" rel="noopener">Seed</a>.</p><p><strong>Bridge:</strong> A seed is a whole plant in miniature — plus a packed lunch. It waits for the right conditions. Notice: potential is not the same as growth. The seed could become a plant for years and never does. What decides?</p><p><strong>Hands-on:</strong> Soak a dry bean overnight. Cut it open carefully. Find the tiny embryo inside — the baby plant. Draw what you see.</p><p><strong>Tutor check:</strong> "The seed has everything it needs inside. So why doesn't it grow in the packet?"</p></article>
+        <article class="node"><h3>Node 3 — Germination: the experiment.</h3><p><strong>Read:</strong> <a href="https://en.wikipedia.org/wiki/Germination" target="_blank" rel="noopener">Germination</a>.</p><p><strong>Bridge:</strong> This is where watching becomes testing. You don't just observe growth — you ask what it needs, and you check by changing one thing at a time. This node teaches the method everything else runs on: predict, test, compare.</p><p><strong>Hands-on:</strong> Plant beans in 4 cups. Cup A: water + light. Cup B: water, no light (box over it). Cup C: light, no water. Cup D: neither. BEFORE you start, write down what you think will happen in each cup. Check daily for a week.</p><p><strong>Tutor check:</strong> "Before we look at the cups — what did you predict, and what actually happened? Where were you wrong?"</p></article>
+        <article class="node"><h3>Node 4 — Roots and shoots: the plant as a system.</h3><p><strong>Read:</strong> <a href="https://en.wikipedia.org/wiki/Root" target="_blank" rel="noopener">Root</a>, <a href="https://en.wikipedia.org/wiki/Photosynthesis" target="_blank" rel="noopener">Photosynthesis</a>.</p><p><strong>Bridge:</strong> Look at your seedling: roots go down, shoots go up. Nobody told it which way — it senses. The plant is a system with inputs (water, light, air, soil nutrients) and outputs (growth, oxygen, food). Connect it back: the inputs came from Nodes 1–3. Nothing in this path stands alone.</p><p><strong>Hands-on:</strong> Draw your seedling every day for a week — same plant, same angle. Label roots, stem, leaves. Measure its height.</p><p><strong>Tutor check:</strong> "Trace one drop of water from the soil to the leaf. What path does it take, and what does the plant do with it?"</p></article>
+        <article class="node"><h3>Node 5 — The food web: nothing lives alone.</h3><p><strong>Read:</strong> <a href="https://en.wikipedia.org/wiki/Food_web" target="_blank" rel="noopener">Food web</a>, <a href="https://en.wikipedia.org/wiki/Ecosystem" target="_blank" rel="noopener">Ecosystem</a>.</p><p><strong>Bridge:</strong> Zoom all the way out. Your bean plant is one node in a web — something eats it, something eats that, everything returns to the soil. Remember Node 1? The soil creatures eat the dead leaves. The loop closes. Now the disaster test: what happens to this web if the soil dies? If the pollinators vanish? One broken node, and the whole web feels it.</p><p><strong>Hands-on:</strong> Outside, find 5 living things (plant, insect, bird, worm, anything). Draw arrows: who eats whom, who depends on whom. Find where your bean plant would fit.</p><p><strong>Tutor check:</strong> "Remove one thing from your web drawing. What breaks? Now remove the soil. What happens?"</p></article>
+      </div>
+      <p class="path-closing">End of Path 1. The pattern to carry forward: observe → test → connect → zoom out → ask what breaks.</p>
+    </section>
+
+    <section class="view" id="tutor-view">
+      <div class="prompt-wrap">
+        <section class="prompt-card"><h2>Turn any AI into a tutor on rails.</h2><p>Paste this with the current subject, age and completed nodes. It does not replace the learner’s observation; it organizes the questioning.</p>
+          <div class="prompt-text" id="promptText"># CSC Formation Tutor — System Prompt
+You are the tutor for the Common Sense Code Formation, Phase 1 ("The Sensing Body"). A child is working through Prototype Path 1: "What Grows" — five nodes in fixed order: 1) Soil, 2) Seed, 3) Germination (experiment), 4) Roots/shoots/photosynthesis, 5) Food web/ecosystem. Each node has a Wikipedia article to read, a hands-on task, and a check question.
+Your rules:
+1. Follow the path order. Never teach Node 4 content during Node 1. If the child asks ahead, say what's coming without teaching it: "We'll get there — first let's finish the soil."
+2. Ask before telling. When the child has a question, first ask what they think. Socratic first, answers second.
+3. Say "I don't know" when you don't. Never bluff, never invent facts. If unsure, say so and suggest how to check (look it up, test it, ask someone).
+4. Big, full answers on demand. When the child asks "why?", give the full causal chain — no dumbing down, just clear language. Depth is a reward for curiosity.
+5. Always connect backward. Tie every answer to earlier nodes: "Remember the soil from Node 1? This is where it comes back."
+6. Push toward doing. Every session ends with something to touch, try, or observe — never just reading. Hands before abstractions.
+7. Run the calibration habit. Before any experiment: "Write down what you think will happen." After: "What did you predict, what happened, where were you wrong?" Being wrong is the lesson.
+8. Check, don't lecture. Use each node's check question as a conversation starter. Never just hand over the answer — guide the child to it with smaller questions.
+9. Plain language. No jargon without immediate explanation. Short sentences. One idea at a time.
+10. The disaster lens. Where it fits naturally, ask: "What would happen if this broke?" — train the instinct to ask what breaks, not just how it works.
+11. Warmth, no condescension. You're a patient older sibling, not a textbook. Curiosity gets praised specifically ("good question — that connects to Node 2").
+What you never do:
+- Never skip the hands-on task ("just read about it instead").
+- Never answer the check questions outright.
+- Never introduce concepts from later nodes early.
+- Never punish wrong predictions — celebrate the check.</div>
+          <button class="copy" id="copyPrompt">Copy tutor prompt</button><div class="status" id="copyStatus" aria-live="polite"></div>
+        </section>
+        <aside class="principles">
+          <div class="principle"><b>1. The syllabus supplies order.</b><span>The tutor must know what came before and what the current node unlocks.</span></div>
+          <div class="principle"><b>2. Reality grades the answer.</b><span>Prediction and observation come before confident explanation.</span></div>
+          <div class="principle"><b>3. Questions precede lectures.</b><span>Understanding is diagnosed before information is delivered.</span></div>
+          <div class="principle"><b>4. “I don’t know” stays legal.</b><span>Uncertainty is a signal to investigate, not a gap to cover with fluency.</span></div>
+          <div class="principle"><b>5. Wikipedia is a map.</b><span>Follow definitions, citations and neighboring concepts; do not confuse breadth with mastery.</span></div>
+        </aside>
+      </div>
+    </section>
+
+    <footer class="source-footer"><span><strong>Formation status:</strong> curriculum architecture draft for testing, not a claim of settled pedagogy.</span><span>Wikipedia links checked as starting points on 15 October 2026.</span></footer>
+  </main>
+  <script>
+    (function(){
+      var tabs=document.querySelectorAll('.tab');
+      var views=document.querySelectorAll('.view');
+      tabs.forEach(function(tab){tab.addEventListener('click',function(){
+        tabs.forEach(function(t){t.setAttribute('aria-selected','false')});
+        views.forEach(function(v){v.classList.remove('active')});
+        tab.setAttribute('aria-selected','true');
+        document.getElementById(tab.dataset.view+'-view').classList.add('active');
+        window.scrollTo({top:document.querySelector('.nav').offsetTop,behavior:'smooth'});
+      })});
+      var activePhase='all';
+      var query='';
+      var phases=document.querySelectorAll('.phase');
+      var empty=document.getElementById('empty');
+      function applyFilters(){
+        var total=0;
+        phases.forEach(function(phase){
+          var inPhase=activePhase==='all'||phase.dataset.phase===activePhase;
+          var any=false;
+          phase.querySelectorAll('.subject').forEach(function(subject){
+            var match=!query||subject.dataset.search.indexOf(query)>-1||subject.textContent.toLowerCase().indexOf(query)>-1;
+            subject.style.display=(inPhase&&match)?'grid':'none';
+            if(inPhase&&match){any=true;total++}
+          });
+          phase.style.display=any?'grid':'none';
+        });
+        empty.style.display=total?'none':'block';
+      }
+      document.getElementById('search').addEventListener('input',function(e){query=e.target.value.trim().toLowerCase();applyFilters()});
+      document.querySelectorAll('.filter').forEach(function(btn){btn.addEventListener('click',function(){
+        document.querySelectorAll('.filter').forEach(function(b){b.classList.remove('active')});btn.classList.add('active');activePhase=btn.dataset.phase;applyFilters();
+      })});
+      document.getElementById('copyPrompt').addEventListener('click',function(){
+        var text=document.getElementById('promptText').innerText;
+        var status=document.getElementById('copyStatus');
+        if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(text).then(function(){status.textContent='Copied. Add the learner’s current position before using it.'}).catch(function(){fallback(text,status)})}else{fallback(text,status)}
+      });
+      function fallback(text,status){var area=document.createElement('textarea');area.value=text;area.setAttribute('readonly','');area.style.position='fixed';area.style.opacity='0';document.body.appendChild(area);area.select();try{document.execCommand('copy');status.textContent='Copied. Add the learner’s current position before using it.'}catch(e){status.textContent='Select the prompt above and copy it manually.'}document.body.removeChild(area)}
+    })();
+  </script>
+</body>
+</html>
