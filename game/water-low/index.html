@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>When water runs low | Water, scene 2 | Common Sense Code</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Common Sense Code, interactive lessons</p>
+  <p class="kicker">Water, scene 2</p>
+  <h1>When water runs low</h1>
+  <p class="lede">Water is running short. Choose an action. Read what the sources say about it.</p>
+
+  <h2>Choose an action</h2>
+  <div class="choices" id="choices" role="group" aria-label="Choose an action">
+    <button type="button" class="choice" data-pick="thirst" aria-pressed="false">
+      <strong>Drink only when thirsty</strong>
+      <span>Wait for thirst before drinking.</span>
+    </button>
+    <button type="button" class="choice" data-pick="regular" aria-pressed="false">
+      <strong>Drink at regular intervals</strong>
+      <span>Drink on a schedule, thirsty or not.</span>
+    </button>
+    <button type="button" class="choice" data-pick="signs" aria-pressed="false">
+      <strong>Watch for the signs of dehydration</strong>
+      <span>What a lack of water does to the body.</span>
+    </button>
+    <button type="button" class="choice" data-pick="urine" aria-pressed="false">
+      <strong>Drink urine</strong>
+      <span>A technique some people recommend.</span>
+    </button>
+  </div>
+
+  <section class="result" id="result" aria-live="polite">
+    <p class="pending">Select an action to read what the sources say.</p>
+  </section>
+
+  <h2>Sources</h2>
+  <ol class="sources">
+    <li>Survival skills, Water section. Wikipedia, the free encyclopedia. Accessed November 10, 2026.</li>
+    <li>U.S. Army. Survival Field Manual FM 21-76, as cited in the Wikipedia article above.</li>
+  </ol>
+
+  <p class="note">Next scene: Boiling. It will appear here once approved.</p>
+
+  <div class="actions">
+    <a class="btn secondary" href="../water/">Back to scene 1</a>
+    <a class="btn secondary" href="../start/">Back to start</a>
+    <button class="btn secondary" type="button" id="reset">Start over</button>
+  </div>
+</main>
+
+<script src="../game.js"></script>
+<script>
+(function () {
+  var TEXT = {
+    thirst:
+      "<h3>Drink only when thirsty</h3>" +
+      "<p>The U.S. Army survival manual does not recommend drinking only when thirsty, because this leads to inadequate hydration.</p>" +
+      "<p>The manual's advice is to drink water at regular intervals instead.</p>",
+    regular:
+      "<h3>Drink at regular intervals</h3>" +
+      "<p>The U.S. Army survival manual recommends drinking water at regular intervals rather than waiting for thirst.</p>" +
+      "<p>Other groups recommend rationing water through what they call \"water discipline.\"</p>",
+    signs:
+      "<h3>The signs of dehydration</h3>" +
+      "<p>A lack of water causes dehydration, which may result in lethargy, headaches, dizziness, confusion, and eventually death.</p>" +
+      "<p>The article states that people in survival situations perish from dehydration, from the effects of waterborne pathogens in untreated water, or from both.</p>",
+    urine:
+      "<h3>Drink urine</h3>" +
+      "<p><strong>Do not drink urine.</strong></p>" +
+      "<p>Some survival experts have recommended drinking urine in times of dehydration. The U.S. Army survival manual (FM 21-76) instructs that this is a myth and should never be used.</p>" +
+      "<p>The reasons given include the high salt content of urine, potential contaminants, and the risk of bacterial exposure, even though urine is often described as sterile.</p>"
+  };
+
+  var result = document.getElementById("result");
+  var buttons = document.querySelectorAll(".choice");
+  var PROMPT = "<p class=\"pending\">Select an action to read what the sources say.</p>";
+
+  function select(key, persist) {
+    if (!TEXT[key]) { return; }
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute("aria-pressed", buttons[i].getAttribute("data-pick") === key ? "true" : "false");
+    }
+    result.innerHTML = TEXT[key];
+    if (persist) {
+      var state = CSC.load();
+      state.water = state.water || {};
+      state.water.low = key;
+      CSC.save(state);
+    }
+  }
+
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener("click", function (e) {
+      select(e.currentTarget.getAttribute("data-pick"), true);
+    });
+  }
+
+  document.getElementById("reset").addEventListener("click", function () {
+    CSC.reset();
+    for (var j = 0; j < buttons.length; j++) { buttons[j].setAttribute("aria-pressed", "false"); }
+    result.innerHTML = PROMPT;
+  });
+
+  var saved = CSC.load();
+  if (saved.water && saved.water.low) { select(saved.water.low, false); }
+})();
+</script>
+</body>
+</html>
