@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Boiling | Water, scene 3 | Common Sense Code</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+  :root { --danger: #9b3b34; }
+  @media (prefers-color-scheme: dark) { :root { --danger: #e8938b; } }
+  .warning { margin: 0 0 1.4rem; padding: 1rem 1.1rem; background: var(--surface); border: 2px solid var(--danger); border-radius: 6px; }
+  .warning p { margin: 0 0 .6rem; }
+  .warning p:last-child { margin-bottom: 0; }
+  .warning .wtitle { color: var(--danger); font-family: Georgia, "Times New Roman", serif; font-size: 1.15rem; }
+  .result .warning { margin: 0 0 1rem; }
+  .result ol { margin: 0 0 .6rem; padding-left: 1.3rem; }
+</style>
+</head>
+<body>
+<main>
+  <p class="kicker">Common Sense Code, interactive lessons</p>
+  <p class="kicker">Water, scene 3</p>
+  <h1>Boiling</h1>
+
+  <aside class="warning" id="warning" role="note" aria-label="Safety warning">
+    <p class="wtitle"><strong>Warning: fuel and chemicals</strong></p>
+    <p>CDC: "You cannot make water containing fuel, toxic chemicals, or radioactive materials safe by boiling or disinfecting it."</p>
+  </aside>
+
+  <p class="lede">CDC: "If you don't have safe bottled water, boil your water to make it safe to drink." Choose a situation. Read the CDC steps for it.</p>
+
+  <h2>Choose a situation</h2>
+  <div class="choices" id="choices" role="group" aria-label="Choose a situation">
+    <button type="button" class="choice" data-pick="clear" aria-pressed="false">
+      <strong>The water is clear</strong>
+      <span>The steps for boiling clear water.</span>
+    </button>
+    <button type="button" class="choice" data-pick="cloudy" aria-pressed="false">
+      <strong>The water is cloudy</strong>
+      <span>What to do before boiling.</span>
+    </button>
+    <button type="button" class="choice" data-pick="altitude" aria-pressed="false">
+      <strong>I am above 6,500 feet</strong>
+      <span>How elevation changes the boil time.</span>
+    </button>
+    <button type="button" class="choice" data-pick="chemicals" aria-pressed="false">
+      <strong>The water may contain fuel or chemicals</strong>
+      <span>Whether boiling makes it safe.</span>
+    </button>
+    <button type="button" class="choice" data-pick="why" aria-pressed="false">
+      <strong>Why boil instead of using a disinfectant</strong>
+      <span>How boiling compares.</span>
+    </button>
+  </div>
+
+  <section class="result" id="result" aria-live="polite">
+    <p class="pending">Select a situation to read the CDC guidance.</p>
+  </section>
+
+  <h2>Sources</h2>
+  <ol class="sources">
+    <li>How to Make Water Safe in an Emergency. Centers for Disease Control and Prevention. September 19, 2024. Accessed November 10, 2026.</li>
+  </ol>
+
+  <p class="note">Next scene: When you cannot boil. It will appear here once approved.</p>
+
+  <div class="actions">
+    <a class="btn secondary" href="../water-low/">Back to scene 2</a>
+    <a class="btn secondary" href="../start/">Back to start</a>
+    <button class="btn secondary" type="button" id="reset">Start over</button>
+  </div>
+</main>
+
+<script src="../game.js"></script>
+<script>
+(function () {
+  /* The warning is static HTML above so it shows without JavaScript.
+     It is copied here so it appears again with every choice. */
+  var WARNING = document.getElementById("warning").outerHTML.replace(' id="warning"', "");
+
+  var STEPS =
+    "<ol>" +
+    "<li>Bring clear water to a rolling boil for 1 minute (at elevations above 6,500 feet, boil for 3 minutes).</li>" +
+    "<li>Let the boiled water cool.</li>" +
+    "<li>Store the boiled water in clean, sanitized containers with tight covers.</li>" +
+    "</ol>";
+
+  var TEXT = {
+    clear:
+      "<h3>The water is clear</h3>" +
+      "<p>CDC: \"Boiling is the best way to kill germs in water.\"</p>" +
+      STEPS +
+      "<p class=\"note\">CDC suggests improving the flat taste of boiled water by pouring it from one container to another and letting it stand for a few hours, or by adding a pinch of salt for each quart or liter of boiled water.</p>",
+    cloudy:
+      "<h3>The water is cloudy</h3>" +
+      "<p>If the water is cloudy, first filter it through a clean cloth, paper towel, or coffee filter. Another option is to let it settle. Then, draw off the clear water and follow the steps below.</p>" +
+      STEPS,
+    altitude:
+      "<h3>I am above 6,500 feet</h3>" +
+      "<p>Bring clear water to a rolling boil for 1 minute (at elevations above 6,500 feet, boil for 3 minutes).</p>" +
+      "<p>Then let the boiled water cool, and store it in clean, sanitized containers with tight covers.</p>",
+    chemicals:
+      "<h3>The water may contain fuel or chemicals</h3>" +
+      "<p><strong>Boiling does not make this water safe.</strong></p>" +
+      "<p>CDC: \"You cannot make water containing fuel, toxic chemicals, or radioactive materials safe by boiling or disinfecting it.\"</p>",
+    why:
+      "<h3>Why boil instead of using a disinfectant</h3>" +
+      "<p>You can kill most germs in water with chemical disinfectants, such as unscented household chlorine bleach, iodine, or chlorine dioxide tablets. However, disinfectants do not work as well as boiling for killing some germs, including the parasites Cryptosporidium and Giardia.</p>" +
+      "<p>CDC: \"Boiling is the best way to kill germs in water.\"</p>"
+  };
+
+  var result = document.getElementById("result");
+  var buttons = document.querySelectorAll(".choice");
+  var PROMPT = "<p class=\"pending\">Select a situation to read the CDC guidance.</p>";
+
+  function select(key, persist) {
+    if (!TEXT[key]) { return; }
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute("aria-pressed", buttons[i].getAttribute("data-pick") === key ? "true" : "false");
+    }
+    result.innerHTML = WARNING + TEXT[key];
+    if (persist) {
+      var state = CSC.load();
+      state.water = state.water || {};
+      state.water.boil = key;
+      CSC.save(state);
+    }
+  }
+
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener("click", function (e) {
+      select(e.currentTarget.getAttribute("data-pick"), true);
+    });
+  }
+
+  document.getElementById("reset").addEventListener("click", function () {
+    CSC.reset();
+    for (var j = 0; j < buttons.length; j++) { buttons[j].setAttribute("aria-pressed", "false"); }
+    result.innerHTML = PROMPT;
+  });
+
+  var saved = CSC.load();
+  if (saved.water && saved.water.boil) { select(saved.water.boil, false); }
+})();
+</script>
+</body>
+</html>
