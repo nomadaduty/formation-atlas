@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How much water | Water, scene 1 | Common Sense Code</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Common Sense Code, interactive lessons</p>
+  <p class="kicker">Water, scene 1</p>
+  <h1>How much water</h1>
+  <p class="lede">The body is about 60% water, and it needs a steady supply. Choose a situation. Read what the source gives for it.</p>
+
+  <h2>Choose a situation</h2>
+  <div class="choices" id="choices" role="group" aria-label="Choose a situation">
+    <button type="button" class="choice" data-pick="normal" aria-pressed="false">
+      <strong>A normal day</strong>
+      <span>Daily water for one person.</span>
+    </button>
+    <button type="button" class="choice" data-pick="wild" aria-pressed="false">
+      <strong>A day in the wilderness</strong>
+      <span>Daily water outdoors, away from supplies.</span>
+    </button>
+    <button type="button" class="choice" data-pick="none" aria-pressed="false">
+      <strong>No water</strong>
+      <span>How long a person can go without it.</span>
+    </button>
+  </div>
+
+  <section class="result" id="result" aria-live="polite">
+    <p class="pending">Select a situation to read what the source gives.</p>
+  </section>
+
+  <h2>Sources</h2>
+  <ol class="sources">
+    <li>Survival skills, Water section. Wikipedia, the free encyclopedia. Accessed November 10, 2026.</li>
+  </ol>
+
+  <p class="note">Next scene: When water runs low. It will appear here once approved.</p>
+
+  <div class="actions">
+    <a class="btn secondary" href="../start/">Back to start</a>
+    <button class="btn secondary" type="button" id="reset">Start over</button>
+  </div>
+</main>
+
+<script src="../game.js"></script>
+<script>
+(function () {
+  var TEXT = {
+    normal:
+      "<h3>A normal day</h3>" +
+      "<p>A person needs about 3 liters of water a day.</p>" +
+      "<p>The body is about 60% water, so this water replaces what the body loses.</p>",
+    wild:
+      "<h3>A day in the wilderness</h3>" +
+      "<p>In the wilderness, a person needs 4\u20136 liters of water a day.</p>" +
+      "<p>The source advises drinking at regular intervals through the day.</p>",
+    none:
+      "<h3>No water</h3>" +
+      "<p>A person can survive about 3\u20135 days without water.</p>" +
+      "<p>The body is about 60% water.</p>"
+  };
+
+  var result = document.getElementById("result");
+  var buttons = document.querySelectorAll(".choice");
+  var PROMPT = "<p class=\"pending\">Select a situation to read what the source gives.</p>";
+
+  function select(key, persist) {
+    if (!TEXT[key]) { return; }
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute("aria-pressed", buttons[i].getAttribute("data-pick") === key ? "true" : "false");
+    }
+    result.innerHTML = TEXT[key];
+    if (persist) {
+      var state = CSC.load();
+      state.water = state.water || {};
+      state.water.amount = key;
+      CSC.save(state);
+    }
+  }
+
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener("click", function (e) {
+      select(e.currentTarget.getAttribute("data-pick"), true);
+    });
+  }
+
+  document.getElementById("reset").addEventListener("click", function () {
+    CSC.reset();
+    for (var j = 0; j < buttons.length; j++) { buttons[j].setAttribute("aria-pressed", "false"); }
+    result.innerHTML = PROMPT;
+  });
+
+  var saved = CSC.load();
+  if (saved.water && saved.water.amount) { select(saved.water.amount, false); }
+})();
+</script>
+</body>
+</html>
