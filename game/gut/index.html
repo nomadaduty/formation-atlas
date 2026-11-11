@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Gut | Food, scene 3 | Common Sense Code</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+  fieldset.group { margin: 0 0 1.2rem; padding: 0; border: 0; min-width: 0; }
+  fieldset.group legend { padding: 0; margin: 0 0 .5rem; font-family: Georgia, "Times New Roman", serif; font-weight: 700; }
+  .items { display: grid; grid-template-columns: repeat(auto-fill, minmax(9.5rem, 1fr)); gap: .5rem; }
+  .item { display: flex; align-items: center; gap: .6rem; min-height: 3rem; padding: .4rem .7rem; background: var(--surface); border: 2px solid var(--rule); border-radius: 6px; cursor: pointer; }
+  .item input { width: 1.2rem; height: 1.2rem; margin: 0; accent-color: var(--accent); }
+  .item:has(input:checked) { border-color: var(--accent); }
+  .item:focus-within { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .count { font-family: Georgia, "Times New Roman", serif; font-size: 1.3rem; font-weight: 700; margin: 0 0 .4rem; }
+</style>
+</head>
+<body>
+<main>
+  <p class="kicker">Common Sense Code, interactive lessons</p>
+  <p class="kicker">Food, scene 3</p>
+  <h1>The Gut</h1>
+  <p class="lede">Count the different plants in a week of eating. Each plant counts once.</p>
+  <p>The study behind this scene asked participants how many different plants they eat in an average week. Each different plant counts once, including each grain in a multigrain product and all fruits. The list below is an example list. Select every plant you would eat in a week.</p>
+
+  <h2>Choose your plants</h2>
+  <div id="groups"></div>
+
+  <section class="result" id="result" aria-live="polite">
+    <p class="pending">Select plants to see the count.</p>
+  </section>
+
+  <h2>What the study found</h2>
+  <p>In the American Gut Project, participants who ate more than 30 different plant types per week had more diverse gut microbiomes than participants who ate 10 or fewer. This held whether participants described their diet as vegan, vegetarian, or neither. The two groups had 41 and 44 participants.</p>
+  <p>The study is observational. It shows an association. It does not show that eating more plant types causes greater microbial diversity.</p>
+
+  <h2>Sources</h2>
+  <ol class="sources">
+    <li>McDonald D, Hyde E, Debelius JW, et al. American Gut: an Open Platform for Citizen Science Microbiome Research. <em>mSystems</em>. 2018;3(3):e00031-18. doi:10.1128/mSystems.00031-18</li>
+  </ol>
+
+  <p class="note">Next scene: The Wild. It will appear here once approved.</p>
+
+  <div class="actions">
+    <a class="btn secondary" href="../year/">Back to scene 2</a>
+    <a class="btn secondary" href="../start/">Back to start</a>
+    <button class="btn secondary" type="button" id="reset">Start over</button>
+  </div>
+</main>
+
+<script src="../game.js"></script>
+<script>
+(function () {
+  var GROUPS = [
+    ["Vegetables", ["Spinach", "Kale", "Broccoli", "Carrot", "Onion", "Garlic", "Tomato", "Bell pepper", "Cabbage", "Cucumber", "Potato", "Sweet potato", "Beetroot"]],
+    ["Fruits", ["Apple", "Banana", "Orange", "Blueberries", "Strawberries", "Grapes", "Mango"]],
+    ["Grains", ["Oats", "Brown rice", "Wheat", "Barley", "Rye", "Corn"]],
+    ["Legumes", ["Lentils", "Chickpeas", "Black beans", "Peas"]],
+    ["Nuts and seeds", ["Almonds", "Walnuts", "Peanuts", "Sunflower seeds", "Flaxseed"]],
+    ["Herbs and spices", ["Basil", "Parsley", "Oregano", "Ginger", "Turmeric"]]
+  ];
+
+  var host = document.getElementById("groups");
+  var result = document.getElementById("result");
+  var PROMPT = "<p class=\"pending\">Select plants to see the count.</p>";
+  var boxes = [];
+
+  GROUPS.forEach(function (g) {
+    var fs = document.createElement("fieldset");
+    fs.className = "group";
+    var lg = document.createElement("legend");
+    lg.textContent = g[0];
+    fs.appendChild(lg);
+    var grid = document.createElement("div");
+    grid.className = "items";
+    g[1].forEach(function (name) {
+      var label = document.createElement("label");
+      label.className = "item";
+      var input = document.createElement("input");
+      input.type = "checkbox";
+      input.value = name;
+      boxes.push(input);
+      label.appendChild(input);
+      label.appendChild(document.createTextNode(name));
+      grid.appendChild(label);
+    });
+    fs.appendChild(grid);
+    host.appendChild(fs);
+  });
+
+  function band(n) {
+    if (n <= 10) {
+      return "This is 10 or fewer different plants per week. In the study, this is the lower comparison group.";
+    }
+    if (n <= 30) {
+      return "This is between the two groups the study compared. The study reports no result for this range.";
+    }
+    return "This is more than 30 different plants per week. In the study, this is the upper comparison group.";
+  }
+
+  function chosen() {
+    return boxes.filter(function (b) { return b.checked; }).map(function (b) { return b.value; });
+  }
+
+  function update(persist) {
+    var list = chosen();
+    var n = list.length;
+    if (n === 0) {
+      result.innerHTML = PROMPT;
+    } else {
+      result.innerHTML =
+        "<p class=\"count\">" + n + " different " + (n === 1 ? "plant" : "plants") + " per week</p>" +
+        "<p>" + band(n) + "</p>" +
+        "<p class=\"note\">Exactly 30 is in the middle range, because the upper group is more than 30.</p>";
+    }
+    if (persist) {
+      var state = CSC.load();
+      state.food = state.food || {};
+      state.food.plants = list;
+      CSC.save(state);
+    }
+  }
+
+  boxes.forEach(function (b) {
+    b.addEventListener("change", function () { update(true); });
+  });
+
+  document.getElementById("reset").addEventListener("click", function () {
+    CSC.reset();
+    boxes.forEach(function (b) { b.checked = false; });
+    update(false);
+  });
+
+  var saved = CSC.load();
+  if (saved.food && saved.food.plants && saved.food.plants.length) {
+    boxes.forEach(function (b) { b.checked = saved.food.plants.indexOf(b.value) !== -1; });
+  }
+  update(false);
+})();
+</script>
+</body>
+</html>
