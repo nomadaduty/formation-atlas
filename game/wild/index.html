@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Wild | Food, scene 4 | Common Sense Code</title>
+<link rel="stylesheet" href="../style.css">
+<style>
+  :root { --danger: #9b3b34; }
+  @media (prefers-color-scheme: dark) { :root { --danger: #e8938b; } }
+  .warning { margin: 0 0 1.4rem; padding: 1rem 1.1rem; background: var(--surface); border: 2px solid var(--danger); border-radius: 6px; }
+  .warning p { margin: 0 0 .6rem; }
+  .warning p:last-child { margin-bottom: 0; }
+  .warning .wtitle { color: var(--danger); font-family: Georgia, "Times New Roman", serif; font-size: 1.15rem; }
+  .result .warning { margin: 0 0 1rem; }
+</style>
+</head>
+<body>
+<main>
+  <p class="kicker">Common Sense Code, interactive lessons</p>
+  <p class="kicker">Food, scene 4</p>
+  <h1>The Wild</h1>
+
+  <aside class="warning" id="warning" role="note" aria-label="Safety warning">
+    <p class="wtitle"><strong>Warning: wild food</strong></p>
+    <p><strong>Wild plants.</strong> Mississippi State University Extension: "Before eating any wild plant, you should be 100 percent certain that you have identified it correctly and that it is not poisonous."</p>
+    <p><strong>Wild mushrooms.</strong> Poison Control: "NEVER pick and eat wild mushrooms unless they've been identified by an expert!"</p>
+    <p>If you think that someone has eaten a wild mushroom, call a poison center right away at 1-800-222-1222.</p>
+  </aside>
+
+  <p class="lede">Where food comes from outside a store: what can be gathered, what takes skill, and what to do when you cannot identify something. This scene names no specific wild plant or mushroom as edible.</p>
+
+  <h2>Choose a source of food</h2>
+  <div class="choices" id="choices" role="group" aria-label="Choose a source of food">
+    <button type="button" class="choice" data-pick="plants" aria-pressed="false">
+      <strong>Plants</strong>
+      <span>Gathering plant foods.</span>
+    </button>
+    <button type="button" class="choice" data-pick="meat" aria-pressed="false">
+      <strong>Meat</strong>
+      <span>Trapping, hunting and fishing.</span>
+    </button>
+    <button type="button" class="choice" data-pick="unknown" aria-pressed="false">
+      <strong>Something I cannot identify for certain</strong>
+      <span>A plant or mushroom you are not sure about.</span>
+    </button>
+  </div>
+
+  <section class="result" id="result" aria-live="polite">
+    <p class="pending">Select a source of food to read what it involves.</p>
+  </section>
+
+  <h2>Sources</h2>
+  <ol class="sources">
+    <li>Bell S. Forgotten Foods: Introduction to Wild Edible Plants. Publication 4173. Mississippi State University Extension.</li>
+    <li>Poison Control (poison.org). Mushroom poisoning: Don't invite "the death angel" to dinner. Updated January 18, 2026.</li>
+    <li>Survival skills. Wikipedia, the free encyclopedia. Accessed November 10, 2026.</li>
+  </ol>
+
+  <p class="note">This is the last scene of the Food lesson.</p>
+
+  <div class="actions">
+    <a class="btn secondary" href="../gut/">Back to scene 3</a>
+    <a class="btn secondary" href="../start/">Back to start</a>
+    <button class="btn secondary" type="button" id="reset">Start over</button>
+  </div>
+</main>
+
+<script src="../game.js"></script>
+<script>
+(function () {
+  /* The warning is static HTML above so it shows without JavaScript.
+     It is copied here so it appears again with every choice. */
+  var WARNING = document.getElementById("warning").outerHTML.replace(' id="warning"', "");
+
+  var TEXT = {
+    plants:
+      "<h3>Plants</h3>" +
+      "<p>Plants are the easiest food to find, because they stay in one place and take little effort to gather.</p>" +
+      "<p>The source lists root tubers, fruit, mushrooms, nuts, beans, cereals, leaves, cacti, ants and algae among the foods that can be gathered. Most are prepared by boiling.</p>" +
+      "<p>Gathering is only the first step. Identifying a plant correctly is a separate skill, and the warning above applies to every item on that list.</p>",
+    meat:
+      "<h3>Meat</h3>" +
+      "<p>Trapping, hunting and fishing provide high-calorie meat. They require skills and equipment, such as bows, snares and nets.</p>" +
+      "<p>Compared with gathering plants, meat takes more skill and more gear.</p>",
+    unknown:
+      "<h3>Something I cannot identify for certain</h3>" +
+      "<p><strong>Do not eat it.</strong></p>" +
+      "<p>Poison Control requires that wild mushrooms be identified by an expert. Mississippi State University Extension requires certainty about the identification of any wild plant.</p>" +
+      "<p>Poisoning from poisonous plants or fungi is among the common dangerous injuries in wild settings. Even a small amount of some plants can cause illness or death.</p>" +
+      "<p>The \"universal edibility test\" is unreliable, so it does not replace identification.</p>" +
+      "<p>Poison Control notes that identification learned in one area is not reliable in another. The Boy Scouts of America especially discourages foraging, because someone in a survival situation is unlikely to have the knowledge to decide safely.</p>" +
+      "<p>The step the sources point to is identification by an expert who knows your area.</p>"
+  };
+
+  var result = document.getElementById("result");
+  var buttons = document.querySelectorAll(".choice");
+  var PROMPT = "<p class=\"pending\">Select a source of food to read what it involves.</p>";
+
+  function select(key, persist) {
+    if (!TEXT[key]) { return; }
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute("aria-pressed", buttons[i].getAttribute("data-pick") === key ? "true" : "false");
+    }
+    result.innerHTML = WARNING + TEXT[key];
+    if (persist) {
+      var state = CSC.load();
+      state.food = state.food || {};
+      state.food.wild = key;
+      CSC.save(state);
+    }
+  }
+
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener("click", function (e) {
+      select(e.currentTarget.getAttribute("data-pick"), true);
+    });
+  }
+
+  document.getElementById("reset").addEventListener("click", function () {
+    CSC.reset();
+    for (var j = 0; j < buttons.length; j++) { buttons[j].setAttribute("aria-pressed", "false"); }
+    result.innerHTML = PROMPT;
+  });
+
+  var saved = CSC.load();
+  if (saved.food && saved.food.wild) { select(saved.food.wild, false); }
+})();
+</script>
+</body>
+</html>

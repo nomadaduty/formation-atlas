@@ -40,7 +40,7 @@
     <li>McDonald D, Hyde E, Debelius JW, et al. American Gut: an Open Platform for Citizen Science Microbiome Research. <em>mSystems</em>. 2018;3(3):e00031-18. doi:10.1128/mSystems.00031-18</li>
   </ol>
 
-  <p class="note">Next scene: The Wild. It will appear here once approved.</p>
+  <p><a class="btn" href="../wild/">Next: The Wild</a></p>
 
   <div class="actions">
     <a class="btn secondary" href="../year/">Back to scene 2</a>
@@ -112,7 +112,7 @@
       result.innerHTML =
         "<p class=\"count\">" + n + " different " + (n === 1 ? "plant" : "plants") + " per week</p>" +
         "<p>" + band(n) + "</p>" +
-        "<p class=\"note\">Exactly 30 is in the middle range, because the upper group is more than 30.</p>";
+        (n === 30 ? "<p class=\"note\">Exactly 30 is in the middle range, because the upper group is more than 30.</p>" : "");
     }
     if (persist) {
       var state = CSC.load();
