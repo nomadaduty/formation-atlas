@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Interactive lessons | Common Sense Code</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Common Sense Code</p>
+  <h1>Interactive lessons</h1>
+  <p class="lede">Each lesson is a short sequence of scenes. You make a choice, read what it provides or costs, and move to the next scene. Every fact links to the Formation Atlas.</p>
+
+  <h2>Food</h2>
+  <p>A reference diet, what it provides over a year, and how to find food safely. Four scenes.</p>
+  <div class="actions">
+    <a class="btn" href="../food/">Begin Food, scene 1</a>
+    <button class="btn secondary" type="button" id="reset">Start over</button>
+  </div>
+  <p class="note" id="status" role="status"></p>
+</main>
+<script src="../game.js"></script>
+<script>
+  document.getElementById("reset").addEventListener("click", function () {
+    CSC.reset();
+    document.getElementById("status").textContent = "Progress cleared.";
+  });
+</script>
+</body>
+</html>

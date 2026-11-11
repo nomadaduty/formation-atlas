@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Plate | Food, scene 1 | Common Sense Code</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Common Sense Code, interactive lessons</p>
+  <p class="kicker">Food, scene 1</p>
+  <h1>The Plate</h1>
+  <p class="lede">A plate is a day of eating, in proportions. Build a plate. Read what the plate provides.</p>
+
+  <figure class="figure">
+    <svg id="plate-svg" viewBox="0 0 200 200" role="img" aria-labelledby="plate-title"></svg>
+    <figcaption id="plate-caption">Illustrative proportions. Not drawn to scale of the reference amounts below.</figcaption>
+  </figure>
+
+  <h2>Choose a plate</h2>
+  <div class="choices" id="choices" role="group" aria-label="Choose a plate">
+    <button type="button" class="choice" data-plate="A" aria-pressed="false">
+      <strong>Plate A: Reference plate</strong>
+      <span>Mostly plants, small amounts of animal foods.</span>
+    </button>
+    <button type="button" class="choice" data-plate="B" aria-pressed="false">
+      <strong>Plate B: Meat-heavy plate</strong>
+      <span>Red meat as the main food.</span>
+    </button>
+    <button type="button" class="choice" data-plate="C" aria-pressed="false">
+      <strong>Plate C: Processed plate</strong>
+      <span>Refined grains, added sugars, processed foods.</span>
+    </button>
+  </div>
+
+  <section class="result" id="result" aria-live="polite">
+    <p class="pending">Select a plate to read what it provides.</p>
+  </section>
+
+  <h2>Reference amounts</h2>
+  <p>Daily targets for one adult, at an intake of 2,500 kcal per day. Amounts vary with body size and activity level.</p>
+  <div class="table-wrap">
+    <table>
+      <caption>Reference plate, grams per day</caption>
+      <thead><tr><th scope="col">Food</th><th scope="col">Per day</th></tr></thead>
+      <tbody>
+        <tr><td>Whole grains</td><td>232 g</td></tr>
+        <tr><td>Vegetables</td><td>300 g</td></tr>
+        <tr><td>Fruits</td><td>200 g</td></tr>
+        <tr><td>Dairy foods</td><td>250 g</td></tr>
+        <tr><td>Legumes</td><td>75 g</td></tr>
+        <tr><td>Nuts</td><td>50 g</td></tr>
+        <tr><td>Tubers or starchy vegetables</td><td>50 g</td></tr>
+        <tr><td>Unsaturated oils</td><td>40 g</td></tr>
+        <tr><td>Poultry</td><td>29 g</td></tr>
+        <tr><td>Fish</td><td>28 g</td></tr>
+        <tr><td>Red meat (beef, lamb, pork)</td><td>14 g</td></tr>
+        <tr><td>Eggs</td><td>13 g</td></tr>
+        <tr><td>Added sugars</td><td>31 g or less</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <h2>Soil</h2>
+  <p>Production methods and crop choices affect soil health.</p>
+  <!-- TODO: replace with the direct Botany subject page URL when available. -->
+  <p><a href="https://nomadaduty.github.io/formation-atlas/csc-formation-atlas.html">Formation Atlas, Botany section</a></p>
+
+  <h2>Sources</h2>
+  <ol class="sources">
+    <li>Willett W, Rockström J, Loken B, et al. Food in the Anthropocene: the EAT-Lancet Commission on Healthy Diets from Sustainable Food Systems. <em>The Lancet</em>. 2019;393(10170):447–492. Daily targets are for an intake of 2,500 kcal per day.</li>
+  </ol>
+
+  <p class="note">Next scene: The Year. It will appear here once approved.</p>
+
+  <div class="actions">
+    <a class="btn secondary" href="../start/">Back to start</a>
+    <button class="btn secondary" type="button" id="reset">Start over</button>
+  </div>
+</main>
+
+<script src="../game.js"></script>
+<script>
+(function () {
+  var PLATES = {
+    A: {
+      alt: "A plate viewed from above: vegetables, whole grains, beans, a small portion of fish, and a glass of water.",
+      slices: [
+        { f: 0.38, c: "#4f8a4b" },
+        { f: 0.27, c: "#c9a45c" },
+        { f: 0.25, c: "#8a5a3b" },
+        { f: 0.10, c: "#6c9fb8" }
+      ],
+      glass: true,
+      html:
+        "<h3>Plate A provides</h3>" +
+        "<p>This plate provides the reference amounts listed below. Over one year, the same plate provides 109.5 kg of vegetables and 5.1 kg of red meat.</p>" +
+        "<p class=\"note\">Computed from the daily targets: 300 g × 365 days = 109.5 kg; 14 g × 365 days = 5.1 kg.</p>"
+    },
+    B: {
+      alt: "A plate viewed from above: mostly red meat, with small portions of vegetables, grains, and beans.",
+      slices: [
+        { f: 0.60, c: "#9b3b34" },
+        { f: 0.15, c: "#4f8a4b" },
+        { f: 0.15, c: "#c9a45c" },
+        { f: 0.10, c: "#8a5a3b" }
+      ],
+      glass: false,
+      html:
+        "<h3>Plate B provides</h3>" +
+        "<p>This plate provides more red meat and less fiber than the reference plate. It provides fewer vegetables, legumes, and whole grains.</p>"
+    },
+    C: {
+      alt: "A plate viewed from above: refined grains, processed foods, and sweetened items.",
+      slices: [
+        { f: 0.40, c: "#e6dcc3" },
+        { f: 0.30, c: "#b5773a" },
+        { f: 0.30, c: "#d98fa0" }
+      ],
+      glass: false,
+      html:
+        "<h3>Plate C provides</h3>" +
+        "<p>This plate provides more added sugars and refined grains and less fiber than the reference plate.</p>"
+    }
+  };
+
+  var NS = "http://www.w3.org/2000/svg";
+  var svg = document.getElementById("plate-svg");
+  var result = document.getElementById("result");
+  var buttons = document.querySelectorAll(".choice");
+  var DEFAULT_ALT = "An empty plate viewed from above.";
+
+  function el(name, attrs) {
+    var n = document.createElementNS(NS, name);
+    for (var k in attrs) { n.setAttribute(k, attrs[k]); }
+    return n;
+  }
+
+  function point(cx, cy, r, a) {
+    return [cx + r * Math.cos(a), cy + r * Math.sin(a)];
+  }
+
+  function drawPlate(key) {
+    var data = key ? PLATES[key] : null;
+    while (svg.firstChild) { svg.removeChild(svg.firstChild); }
+    var title = el("title", { id: "plate-title" });
+    title.textContent = data ? data.alt : DEFAULT_ALT;
+    svg.appendChild(title);
+    svg.appendChild(el("circle", { cx: 100, cy: 100, r: 92, fill: "#ffffff", stroke: "#8a948d", "stroke-width": 2 }));
+    svg.appendChild(el("circle", { cx: 100, cy: 100, r: 76, fill: "none", stroke: "#d5dbd7", "stroke-width": 1 }));
+    if (!data) { return; }
+    var start = -Math.PI / 2;
+    data.slices.forEach(function (s) {
+      var end = start + s.f * 2 * Math.PI;
+      var p0 = point(100, 100, 68, start);
+      var p1 = point(100, 100, 68, end);
+      var large = (end - start) > Math.PI ? 1 : 0;
+      var d = "M100,100 L" + p0[0].toFixed(2) + "," + p0[1].toFixed(2) +
+              " A68,68 0 " + large + " 1 " + p1[0].toFixed(2) + "," + p1[1].toFixed(2) + " Z";
+      svg.appendChild(el("path", { d: d, fill: s.c, stroke: "#ffffff", "stroke-width": 2 }));
+      start = end;
+    });
+    if (data.glass) {
+      svg.appendChild(el("circle", { cx: 176, cy: 24, r: 14, fill: "#dcecf5", stroke: "#6c9fb8", "stroke-width": 2 }));
+    }
+  }
+
+  function select(key, persist) {
+    if (!PLATES[key]) { return; }
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute("aria-pressed", buttons[i].getAttribute("data-plate") === key ? "true" : "false");
+    }
+    result.innerHTML = PLATES[key].html;
+    drawPlate(key);
+    if (persist) {
+      var state = CSC.load();
+      state.food = state.food || {};
+      state.food.plate = key;
+      CSC.save(state);
+    }
+  }
+
+  function clear() {
+    for (var i = 0; i < buttons.length; i++) { buttons[i].setAttribute("aria-pressed", "false"); }
+    result.innerHTML = "<p class=\"pending\">Select a plate to read what it provides.</p>";
+    drawPlate(null);
+  }
+
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener("click", function (e) {
+      select(e.currentTarget.getAttribute("data-plate"), true);
+    });
+  }
+
+  document.getElementById("reset").addEventListener("click", function () {
+    CSC.reset();
+    clear();
+  });
+
+  var saved = CSC.load();
+  if (saved.food && saved.food.plate) { select(saved.food.plate, false); } else { drawPlate(null); }
+})();
+</script>
+</body>
+</html>
