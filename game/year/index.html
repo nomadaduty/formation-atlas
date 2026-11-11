@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Year | Food, scene 2 | Common Sense Code</title>
+<link rel="stylesheet" href="../style.css">
+</head>
+<body>
+<main>
+  <p class="kicker">Common Sense Code, interactive lessons</p>
+  <p class="kicker">Food, scene 2</p>
+  <h1>The Year</h1>
+  <p class="lede">The same plate, repeated every day. This scene uses the reference plate from scene 1. Each figure is the daily target multiplied by the number of days, with the calculation shown.</p>
+
+  <h2>Choose a period</h2>
+  <div class="choices" id="choices" role="group" aria-label="Choose a period">
+    <button type="button" class="choice" data-period="day" aria-pressed="false">
+      <strong>One day</strong>
+      <span>The daily targets.</span>
+    </button>
+    <button type="button" class="choice" data-period="year" aria-pressed="false">
+      <strong>One year</strong>
+      <span>Each daily target × 365.</span>
+    </button>
+    <button type="button" class="choice" data-period="forty" aria-pressed="false">
+      <strong>Forty years</strong>
+      <span>Each daily target × 365 × 40, with no change in amounts.</span>
+    </button>
+  </div>
+
+  <section class="result" id="result" aria-live="polite">
+    <p class="pending">Select a period to read what the plate provides over that time.</p>
+  </section>
+
+  <h2>Sources</h2>
+  <ol class="sources">
+    <li>Willett W, Rockström J, Loken B, et al. Food in the Anthropocene: the EAT-Lancet Commission on Healthy Diets from Sustainable Food Systems. <em>The Lancet</em>. 2019;393(10170):447–492. Daily targets are for an intake of 2,500 kcal per day.</li>
+  </ol>
+
+  <p class="note">Wheat, rice, dry beans and lentils are counted dry and raw, not cooked — that is how the paper gives them.</p>
+
+  <p class="note">Next scene: The Gut. It will appear here once approved.</p>
+
+  <div class="actions">
+    <a class="btn secondary" href="../food/">Back to scene 1</a>
+    <a class="btn secondary" href="../start/">Back to start</a>
+    <button class="btn secondary" type="button" id="reset">Start over</button>
+  </div>
+</main>
+
+<script src="../game.js"></script>
+<script>
+(function () {
+  var FOODS = [
+    ["Whole grains", 232],
+    ["Vegetables", 300],
+    ["Fruits", 200],
+    ["Dairy foods", 250],
+    ["Legumes", 75],
+    ["Nuts", 50],
+    ["Tubers or starchy vegetables", 50],
+    ["Unsaturated oils", 40],
+    ["Poultry", 29],
+    ["Fish", 28],
+    ["Red meat (beef, lamb, pork)", 14],
+    ["Eggs", 13],
+    ["Added sugars (upper limit)", 31]
+  ];
+  var DAYS = { day: 1, year: 365, forty: 14600 };
+  var HEAD = { day: "Per day", year: "Per year", forty: "Over 40 years" };
+
+  var result = document.getElementById("result");
+  var buttons = document.querySelectorAll(".choice");
+  var PROMPT = "<p class=\"pending\">Select a period to read what the plate provides over that time.</p>";
+
+  function group(n) { return n.toLocaleString("en-US"); }
+
+  /* grams is an integer, so rounding is exact and the same for every row (half up). */
+  function fmt(grams, key) {
+    if (key === "day") { return group(grams) + " g"; }
+    if (key === "year") { return (Math.round(grams / 100) / 10).toFixed(1) + " kg"; }
+    return group(Math.round(grams / 1000)) + " kg";
+  }
+
+  function amount(name) {
+    for (var i = 0; i < FOODS.length; i++) { if (FOODS[i][0].indexOf(name) === 0) { return FOODS[i][1]; } }
+    return 0;
+  }
+
+  function render(key) {
+    var days = DAYS[key];
+    var total = 0;
+    var rows = "";
+    FOODS.forEach(function (f) {
+      total += f[1];
+      rows += "<tr><td>" + f[0] + "</td><td>" + f[1] + " g</td><td>" + fmt(f[1] * days, key) + "</td></tr>";
+    });
+    var veg = amount("Vegetables"), red = amount("Red meat");
+    var html =
+      "<h3>" + (key === "day" ? "The plate over one day" : key === "year" ? "The plate over one year" : "The plate over forty years") + "</h3>" +
+      "<div class=\"table-wrap\"><table>" +
+      "<caption>Reference plate, 2,500 kcal per day</caption>" +
+      "<thead><tr><th scope=\"col\">Food</th><th scope=\"col\">Per day</th><th scope=\"col\">" + HEAD[key] + "</th></tr></thead>" +
+      "<tbody>" + rows +
+      "<tr><th scope=\"row\">Total</th><th>" + group(total) + " g</th><th>" + fmt(total * days, key) + "</th></tr>" +
+      "</tbody></table></div>";
+
+    if (key === "year") {
+      html +=
+        "<p class=\"note\">Vegetables: " + veg + " g × 365 days = " + fmt(veg * 365, "year") + ". Red meat: " + red + " g × 365 days = " + fmt(red * 365, "year") + ".</p>";
+    }
+    if (key === "forty") {
+      html +=
+        "<p class=\"note\">Vegetables: " + veg + " g × 365 days × 40 years = " + fmt(veg * 14600, "forty") + ". Red meat: " + red + " g × 365 days × 40 years = " + fmt(red * 14600, "forty") + ". Total: " + fmt(total * 14600, "forty") + ", about " + (Math.round(total * 14600 / 100000) / 10).toFixed(1) + " tonnes.</p>" +
+        "<p class=\"note\">This is simple multiplication. It assumes the same daily amounts every day for 40 years. It is not a projection.</p>";
+    }
+    html +=
+      "<p class=\"note\">Added sugars are an upper limit, so that row is a maximum. Rows are rounded individually; the total is calculated from unrounded amounts, so rows may not add exactly to the total.</p>";
+    result.innerHTML = html;
+  }
+
+  function select(key, persist) {
+    if (!DAYS[key]) { return; }
+    for (var i = 0; i < buttons.length; i++) {
+      buttons[i].setAttribute("aria-pressed", buttons[i].getAttribute("data-period") === key ? "true" : "false");
+    }
+    render(key);
+    if (persist) {
+      var state = CSC.load();
+      state.food = state.food || {};
+      state.food.period = key;
+      CSC.save(state);
+    }
+  }
+
+  for (var i = 0; i < buttons.length; i++) {
+    buttons[i].addEventListener("click", function (e) {
+      select(e.currentTarget.getAttribute("data-period"), true);
+    });
+  }
+
+  document.getElementById("reset").addEventListener("click", function () {
+    CSC.reset();
+    for (var j = 0; j < buttons.length; j++) { buttons[j].setAttribute("aria-pressed", "false"); }
+    result.innerHTML = PROMPT;
+  });
+
+  var saved = CSC.load();
+  if (saved.food && saved.food.period) { select(saved.food.period, false); }
+})();
+</script>
+</body>
+</html>
